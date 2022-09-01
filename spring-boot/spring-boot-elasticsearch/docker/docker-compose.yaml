@@ -1,0 +1,52 @@
+version: "3.9"
+services:
+
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.17.6
+    ports:
+      - 9200:9200
+      - 9300:9300
+    volumes:
+      - ./data/secrets:/run/secrets
+    environment:
+      - cluster.name=es
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms4g -Xmx4g
+      - xpack.security.enabled=false
+      - xpack.ml.enabled=false
+      - KEYSTORE_PASSWORD=123456
+    restart: always
+    networks:
+      - elk
+
+
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.17.6
+    ports:
+      - 5601:5601
+    environment:
+      - SERVER_HOST=0.0.0.0
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+      - LOGGING_JSON=false
+      - ENTERPRISESEARCH_ENABLED=false
+      - TELEMETRY_ENABLED=false
+      - MONITORING_ENABLED=false
+      - NEWSFEED_ENABLED=false
+      - XPACK_APM_ENABLED=false
+      - XPACK_GRAPH_ENABLED=false
+      - XPACK_MAPS_ENABLED=false
+      - XPACK_ML_ENABLED=false
+      - XPACK_REPORTING_ENABLED=false
+      - XPACK_ROLLUP_ENABLED=false
+      - XPACK_LICENSE_MANAGEMENT_ENABLED=false
+    restart: always
+    depends_on:
+      - elasticsearch
+    networks:
+      - elk
+
+networks:
+  elk:
+    name: elasticsearchnetworks
